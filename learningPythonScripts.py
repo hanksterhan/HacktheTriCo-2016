@@ -28,11 +28,17 @@ def get_active_players(letter):
 	for player in tr:
 		active_players.append(player.text.encode('utf-8'))
 		active_players_ids.append(player.find("a").get("href"))
-	print active_players_ids
+	# print active_players_ids
+
+	# This for loop is shortening the ids of ALL the active players
+
+		#maybe find the th tags and iterate through those instead
+
+def extractPlayerIds():
 	for i in range(len(active_players_ids)):
 		temp = active_players_ids[i]
 		active_players_ids[i] = temp[8:(len(temp)-5)]
-		#maybe find the th tags and iterate through those instead
+
 
 
 def populateArrayWithAlphabet():
@@ -82,6 +88,7 @@ def main():
 	alphabet = populateArrayWithAlphabet()
 	for i in range(len(alphabet)):
 		get_active_players(alphabet[i])
+	extractPlayerIds()
 	print active_players_ids
 	
 	# dynamic_data_entry()
