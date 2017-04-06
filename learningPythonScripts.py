@@ -2,7 +2,8 @@ import requests, sqlite3
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
 
-BASE_URL = "http://www.basketball-reference.com/players/a/anthoca01/gamelog/2017/"
+BASE_URL = "http://www.basketball-reference.com/players/{player_id}/gamelog/2017/"
+
 conn = sqlite3.connect('CarmeloAnthony.db')
 c = conn.cursor()
 
@@ -63,23 +64,47 @@ def populateArrayWithAlphabet():
 
 ##Actually appends to the database
 ##Need to add columns like player name and payer ID
-def get_game_data(numOfGame):
-	data2 = []
+def get_game_data(playerID):
 
-	soup = make_soup(BASE_URL)
-	tbody = soup.find(id=numOfGame)
-	for td in tbody.findAll("td"):
-		#print td.get("data-stat") + ":" + td.text
-		data2.append(td.text.encode('utf-8'))
-	c.executemany("INSERT INTO stuffToPlot (game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (data2,))
-	#variables: game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus
-	conn.commit()
-	#print data2
+	playerStats = []
+	gameIDs = []
+
+	gameIDs = get_game_IDs(playerID)
+
+	soup = make_soup(BASE_URL.format(player_id = playerID))
+	## Figure out this nested for loop
+	##First for loop goes vertically and captures each game played in a season
+	##Second goes horizontally and captures each stat accumulated in a game
+	for gameID in gameIDs:
+		tbody = soup.find(id=gameID)
+		#Error on this line
+		# tbody2 = tbody.findALL("td")
+		for td in tbody.findAll("td"):
+			#print td.get("data-stat") + ":" + td.text
+			playerStats.append(td.text.encode('utf-8'))
+		c.executemany("INSERT INTO stuffToPlot (game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (playerStats,))
+		#variables: game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus
+		conn.commit()
 	
 ##helper function
 def make_soup(url):
 	html = urlopen(url).read()
 	return BeautifulSoup(html, "lxml")
+
+##Function to populate an array with all the game IDs for a particular player
+##in a particular season
+def get_game_IDs(playerID):
+	gameIDs = []
+
+	soup = make_soup(BASE_URL.format(player_id = playerID))
+	tbody = soup.find_all("tr")
+	for tr in tbody:
+		gameIDs.append(tr.get("id"))
+	#The following gets rid of rows that don't have the appropriate data
+	numOfNones = gameIDs.count(None)
+	for i in range(0,numOfNones):
+		gameIDs.remove(None)
+	return gameIDs
 
 def main():
 	# create_table()
@@ -87,6 +112,8 @@ def main():
 	# 	get_game_data(id)
 	# 	dynamic_data_entry()
 	# get_active_players()
+
+	get_game_data("a/aldrila01")
 
 	########################################################
 	####        Extracted all the player IDs already    ####
