@@ -1,11 +1,12 @@
-import requests, sqlite3  
+import requests, sqlite3, itertools
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
 
 BASE_URL = "http://www.basketball-reference.com/players/{player_id}/gamelog/2017/"
 
 # conn = sqlite3.connect('CarmeloAnthony.db')
-conn = sqlite3.connect('LaMarcusAldridge.db')
+# conn = sqlite3.connect('LaMarcusAldridge.db')
+conn = sqlite3.connect('nba_data_1617.db')
 c = conn.cursor()
 
 active_players = []
@@ -16,7 +17,7 @@ active_players_ids = []
 ##
 def create_table():
 	#Use all caps for pure sql and lower case for things that aren't
-	c.execute('CREATE TABLE IF NOT EXISTS stuffToPlot(player_id TEXT, game_season TEXT, data_game TEXT, age TEXT, team_id TEXT, game_location TEXT, opp_id TEXT, game_result TEXT, gs TEXT, mp TEXT, fg TEXT, fga TEXT, fg_pct TEXT, fg3 TEXT, fg3a TEXT, fg3_pct TEXT, ft TEXT, fta TEXT, ft_pct TEXT, orb TEXT, drb TEXT, trb TEXT, ast TEXT, stl TEXT, blk TEXT, tov TEXT, pf TEXT, pts TEXT, game_score TEXT, plus_minus TEXT)')
+	c.execute('CREATE TABLE IF NOT EXISTS stuffToPlot(player_name TEXT, player_id TEXT, game_id TEXT, game_season TEXT, data_game TEXT, age TEXT, team_id TEXT, game_location TEXT, opp_id TEXT, game_result TEXT, gs TEXT, mp TEXT, fg TEXT, fga TEXT, fg_pct TEXT, fg3 TEXT, fg3a TEXT, fg3_pct TEXT, ft TEXT, fta TEXT, ft_pct TEXT, orb TEXT, drb TEXT, trb TEXT, ast TEXT, stl TEXT, blk TEXT, tov TEXT, pf TEXT, pts TEXT, game_score TEXT, plus_minus TEXT)')
 
 ## I don't know if I still need this. 
 def dynamic_data_entry():
@@ -70,7 +71,7 @@ def populateArrayWithAlphabet():
 
 ##Actually appends to the database
 ##Need to add columns like player name and payer ID
-def get_game_data(playerID):
+def get_game_data(playerName, playerID):
 
 	gameIDs = []
 
@@ -81,11 +82,13 @@ def get_game_data(playerID):
 	##Second goes horizontally and captures each stat accumulated in a game
 	for gameID in gameIDs:
 		playerStats = []
+		playerStats.append(playerName)
+		playerStats.append(playerID)
 		playerStats.append(gameID)
 		tbody = soup.find(id=gameID.encode('utf-8'))
 		for td in tbody.findAll("td"):
 			playerStats.append(td.text.encode('utf-8'))
-		c.executemany("INSERT INTO stuffToPlot (player_id, game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (playerStats,))
+		c.executemany("INSERT INTO stuffToPlot (player_name, player_id, game_id, game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (playerStats,))
 	# 	#variables: game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus
 		conn.commit()
 
@@ -111,14 +114,12 @@ def get_game_IDs(playerID):
 	return gameIDs
 
 def main():
-	# create_table()
-	# for id in ids:
-	# 	get_game_data(id)
-	# 	dynamic_data_entry()
-	#   get_active_players()
-	file = open("playerIDs.txt","r")
-	for line in file:
-		get_game_data(line)
+	create_table()
+
+	fileName = open("playerNames.txt", "r")
+	fileID = open("playerIDs.txt","r")
+	for name, player_ID in itertools.izip(fileName,fileID):
+		get_game_data(name, player_ID[:(len(player_ID)-1)])
 
 	# file.close()
 	########################################################
@@ -132,7 +133,6 @@ def main():
 	# writePlayerIdstoFile()
 	# writePlayerNamestoFile()
 
-	# dynamic_data_entry()
 	c.close()
 	conn.close()
 
