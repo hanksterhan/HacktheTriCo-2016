@@ -95,7 +95,7 @@ def get_game_IDs(playerID):
 	#The following gets rid of rows that don't have the appropriate data
 	numOfNones = gameIDs.count(None)
 	for i in range(0,numOfNones):
-		gameIDs.remove(None)
+		gameIDs.remove(None) 
 	return gameIDs
 
 def main():
