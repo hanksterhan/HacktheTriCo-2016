@@ -19,7 +19,7 @@ def create_table():
 	#Use all caps for pure sql and lower case for things that aren't
 	c.execute('CREATE TABLE IF NOT EXISTS stuffToPlot(player_name TEXT, player_id TEXT, game_id TEXT, game_season TEXT, data_game TEXT, age TEXT, team_id TEXT, game_location TEXT, opp_id TEXT, game_result TEXT, gs TEXT, mp TEXT, fg TEXT, fga TEXT, fg_pct TEXT, fg3 TEXT, fg3a TEXT, fg3_pct TEXT, ft TEXT, fta TEXT, ft_pct TEXT, orb TEXT, drb TEXT, trb TEXT, ast TEXT, stl TEXT, blk TEXT, tov TEXT, pf TEXT, pts TEXT, game_score TEXT, plus_minus TEXT)')
 
-## I don't know if I still need this. 
+## I don't know if I still need this.
 def dynamic_data_entry():
 	#c.executemany("INSERT INTO stuffToPlot (game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (data2,))
 	#variables: game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus
@@ -38,7 +38,7 @@ def get_active_players(letter):
 		active_players_ids.append(player.find("a").get("href"))
 
 
-##parse active_players_ids so that we can insert it into the url 
+##parse active_players_ids so that we can insert it into the url
 def extractPlayerIds():
 	for i in range(len(active_players_ids)):
 		temp = active_players_ids[i]
@@ -61,7 +61,7 @@ def writePlayerNamestoFile():
 ##helper function to populate an array with an alphabet
 ##so that we can easily find all the active players
 def populateArrayWithAlphabet():
-	alphabet = []	
+	alphabet = []
 	ascii_code = 97
 	for i in range(26):
 		alphabet.append(chr(ascii_code) + '/')
@@ -137,4 +137,3 @@ def main():
 	conn.close()
 
 main()
-

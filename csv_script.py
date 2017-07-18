@@ -1,12 +1,17 @@
-import requests, sqlite3, itertools
+import requests, sqlite3, itertools, csv
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
 
 BASE_URL = "http://www.basketball-reference.com/players/{player_id}/gamelog/2017/"
 
+
+
 active_players = []
 active_players_ids = []
 
+# Mode is set to 'a' for append. 'w' will overwrite
+test_out = open('test.csv','wb')
+mywriter = csv.writer(test_out)
 
 ## Given a letter, this function gets all the active players with last names starting with that letter
 ## The names are stored in active_players and their ids are stored in active_players_id
@@ -61,6 +66,8 @@ def get_game_data(playerName, playerID):
 	gameIDs = get_game_IDs(playerID)
 
 	soup = make_soup(BASE_URL.format(player_id = playerID))
+
+
 	##First for loop goes vertically and captures each game played in a season
 	##Second goes horizontally and captures each stat accumulated in a game
 	for gameID in gameIDs:
@@ -73,10 +80,10 @@ def get_game_data(playerName, playerID):
 			playerStats.append(td.text.encode('utf-8'))
 
         ##TODO: Need to change this to insert the data into a csv file instead of a db file
-		c.executemany("INSERT INTO stuffToPlot (player_name, player_id, game_id, game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (playerStats,))
-	# 	#variables: game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus
-		conn.commit()
 
+		mywriter.writerow(playerStats)
+		#c.executemany("INSERT INTO stuffToPlot (player_name, player_id, game_id, game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (playerStats,))
+	# 	#variables: game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus
 
 ##helper function
 def make_soup(url):
@@ -95,16 +102,21 @@ def get_game_IDs(playerID):
 	#The following gets rid of rows that don't have the appropriate data
 	numOfNones = gameIDs.count(None)
 	for i in range(0,numOfNones):
-		gameIDs.remove(None) 
+		gameIDs.remove(None)
 	return gameIDs
 
 def main():
-	create_table()
-
 	fileName = open("playerNames.txt", "r")
 	fileID = open("playerIDs.txt","r")
+
+	# Testing csv script for single player
+	# get_game_data('Carmelo Anthony', 'a/anthoca01')
+
 	for name, player_ID in itertools.izip(fileName,fileID):
-		get_game_data(name, player_ID[:(len(player_ID)-1)])
+		print name[:(len(name)-1)] + '.', player_ID[:(len(player_ID)-1)] + '.'
+		get_game_data(name[:(len(name)-1)], player_ID[:(len(player_ID)-1)])
+
+	test_out.close()
 
 	# file.close()
 	########################################################
