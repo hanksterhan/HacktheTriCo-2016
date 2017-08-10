@@ -1,4 +1,4 @@
-player_name, player_id, game_id, game_season, data_game, age, team_id, game_location, opp_id, game_result, gs, mp, fg, fga, fg_pct, fg3, fg3a, fg3_pct, ft, fta, ft_pct, orb, drb, trb , ast, stl, blk, tov, pf, pts, game_score, plus_minus
+player,player_id,game_id,game_season,date,age,team_id,location,opp_id,result,gs,mp,fg,fga,fg_pct,fg3,fg3a,fg3_pct,ft,fta,ft_pct,orb,drb,trb,ast,stl,blk,tov,pf,pts,game_score,plus_minus
 Alex Abrines,a/abrinal01,pgl_basic.1,1,2016-10-26,23-086,OKC,@,PHI,W (+6),0,13:24,1,2,.500,1,1,1.000,0,0,,0,1,1,0,0,0,2,3,3,-0.9,+5
 Alex Abrines,a/abrinal01,pgl_basic.2,2,2016-10-30,23-090,OKC,,LAL,W (+17),0,1:49,1,1,1.000,0,0,,3,3,1.000,0,0,0,0,1,0,0,0,5,5.7,0
 Alex Abrines,a/abrinal01,pgl_basic.3,3,2016-11-02,23-093,OKC,@,LAC,W (+2),0,7:54,2,2,1.000,2,2,1.000,0,0,,0,0,0,0,0,0,2,0,6,3.4,+4
